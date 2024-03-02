@@ -10,7 +10,6 @@ namespace Models.Models.Classes
     {
         public int Id { get; set; }
         public string Marks { get; set; }
-
         public int StudentId { get; set; }
         public int SubjectId { get; set; }
 

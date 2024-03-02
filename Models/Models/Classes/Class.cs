@@ -21,7 +21,6 @@ namespace Models.Models.Classes
         public ICollection<Subject> Subjects { get; set; }
         public ICollection<Teacher> Teachers { get; set; }
         public ICollection<Student> Students { get; set; }
-        public int SchoolId { get; set; }
     }
 }
 
