@@ -12,5 +12,6 @@ namespace Repository.IRepositories
     {
         Task<APIResponse<string>> AddTeacher(AddTeacherDto addTeacher);
         Task<APIResponse<string>> CreateClass(AddClassDto classTeacher);
+        Task<APIResponse<string>> CreateSubject(AddSubjectDto classSubject);
     }
 }

@@ -32,5 +32,14 @@ namespace Services.Services
             }
             return classRes;
         }
+        public async Task<APIResponse<string>> AddSubject(AddSubjectDto addSubjectDto)
+        {
+            var subjectRes = await _teacherRepository.CreateSubject(addSubjectDto);
+            if (subjectRes == null)
+            {
+                return ResponseHelper<string>.CreateErrorRes(HttpStatusCode.Conflict, new List<string> { "Subject with the same name already exists" });
+            }
+            return subjectRes;
+        }
     }
 }
