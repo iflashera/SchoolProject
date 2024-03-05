@@ -248,7 +248,7 @@ namespace DataContext
 
             // Admin actions
             new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Teacher").Id,ActionName="AddTeacher" ,AccessDescription="Add Teacher" },
-            new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Teacher").Id,ActionName="CreateClass" ,AccessDescription="Add Class" },
+            //new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Teacher").Id,ActionName="CreateClass" ,AccessDescription="Add Class" },
 
             };
 
@@ -276,35 +276,35 @@ namespace DataContext
             var dbActionsAfterChange = dbContext.ApplicationActions.Include(r => r.ApplicationController).ToList();
             var dbRoles = dbContext.Roles.Include(r => r.ApplicationRole).ToList();
 
-            var accesses = new[]
-            {
-                //account Controller
-              //new AccessInRole{ ApplicationActionId=dbActionsAfterChange.FirstOrDefault(r=>r.ActionName=="Login" && r.ApplicationController.Name=="Account").Id, RoleId=dbRoles.FirstOrDefault(r=>r.ApplicationRole.Name=="Parent").Id},
-              //TeacherController
-              new AccessInRole{ ApplicationActionId=dbActionsAfterChange.FirstOrDefault(r=>r.ActionName=="AddTeacher" && r.ApplicationController.Name=="Teacher").Id, RoleId=dbRoles.FirstOrDefault(r=>r.ApplicationRole.Name=="Admin").Id},
-              new AccessInRole{ ApplicationActionId=dbActionsAfterChange.FirstOrDefault(r=>r.ActionName=="CreateClass" && r.ApplicationController.Name=="Teacher").Id, RoleId=dbRoles.FirstOrDefault(r=>r.ApplicationRole.Name=="Admin").Id},
+            //var accesses = new[]
+            //{
+            //    //account Controller
+            //  //new AccessInRole{ ApplicationActionId=dbActionsAfterChange.FirstOrDefault(r=>r.ActionName=="Login" && r.ApplicationController.Name=="Account").Id, RoleId=dbRoles.FirstOrDefault(r=>r.ApplicationRole.Name=="Parent").Id},
+            //  //TeacherController
+            //  new AccessInRole{ ApplicationActionId=dbActionsAfterChange.FirstOrDefault(r=>r.ActionName=="AddTeacher" && r.ApplicationController.Name=="Teacher").Id, RoleId=dbRoles.FirstOrDefault(r=>r.ApplicationRole.Name=="Admin").Id},
+            //  new AccessInRole{ ApplicationActionId=dbActionsAfterChange.FirstOrDefault(r=>r.ActionName=="CreateClass" && r.ApplicationController.Name=="Teacher").Id, RoleId=dbRoles.FirstOrDefault(r=>r.ApplicationRole.Name=="Admin").Id},
 
-            };
-            foreach (var r in accesses)
-            {
-                if (dbAccesses.FirstOrDefault(t => t.ApplicationActionId == r.ApplicationActionId && t.RoleId == r.RoleId) == null)
-                {
-                    accessesToAdd.Add(r);
-                }
-            }
-            foreach (var r in dbAccesses)
-            {
-                if (accesses.FirstOrDefault(t => t.ApplicationActionId == r.ApplicationActionId && t.RoleId == r.RoleId) == null)
-                {
-                    accessesToRemove.Add(r);
-                }
-                }
+            //};
+            //foreach (var r in accesses)
+            //{
+            //    if (dbAccesses.FirstOrDefault(t => t.ApplicationActionId == r.ApplicationActionId && t.RoleId == r.RoleId) == null)
+            //    {
+            //        accessesToAdd.Add(r);
+            //    }
+            //}
+            //foreach (var r in dbAccesses)
+            //{
+            //    if (accesses.FirstOrDefault(t => t.ApplicationActionId == r.ApplicationActionId && t.RoleId == r.RoleId) == null)
+            //    {
+            //        accessesToRemove.Add(r);
+            //    }
+            //    }
 
-                if (accessesToAdd.Count > 0)
-                {
-                dbContext.AccessInRoles.AddRange(accessesToAdd);
-                dbContext.SaveChanges();
-            }
+            //    if (accessesToAdd.Count > 0)
+            //    {
+            //    dbContext.AccessInRoles.AddRange(accessesToAdd);
+            //    dbContext.SaveChanges();
+            //}
 
 
             if (accessesToRemove.Count > 0)

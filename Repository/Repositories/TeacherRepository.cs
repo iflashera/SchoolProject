@@ -23,16 +23,18 @@ namespace Repository.Repositories
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IRepository<Class> _classRepository;
+        private readonly IRepository<Subject> _subjectRepository;
         private readonly ICurrentUser _currentUser;
 
         public TeacherRepository(SmsDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager,
-        ICurrentUser currentUser, IRepository<Class> classRepository)
+        ICurrentUser currentUser, IRepository<Class> classRepository, IRepository<Subject> subjectRepository)
         {
             _dbContext = dbContext;
             _userManager = userManager;
             _roleManager = roleManager;
             _currentUser = currentUser;
             _classRepository = classRepository; 
+            _subjectRepository = subjectRepository; 
         }
         public async Task<APIResponse<string>> AddTeacher(AddTeacherDto teacherDto)
         {
@@ -111,20 +113,51 @@ namespace Repository.Repositories
         public async Task<APIResponse<string>> CreateClass(AddClassDto addClassDto)
         {
            
-            var stClass = await _dbContext.Classes.FirstOrDefaultAsync(c => c.ClassSection.ToLower() == addClassDto.ClassSection.ToLower() && c.ClassName == addClassDto.Classname && c.Id == _currentUser.Id);
+            var stClass = await _dbContext.Classes.FirstOrDefaultAsync(c => c.ClassSection.ToLower() == addClassDto.ClassSection.ToLower() && c.ClassName == addClassDto.ClassName && c.Id == _currentUser.Id);
             if (stClass != null)
             {
                 return null;
             }
             var payload = new Class
             {
-                ClassName = addClassDto.Classname,                
+                ClassName = addClassDto.ClassName,                
                 ClassSection = addClassDto.ClassSection,
             };
             // await _classRepository.Create(payload);
             _dbContext.Classes.Add(payload);
             _dbContext.SaveChanges();
+            if (addClassDto != null && addClassDto.SubjectIds.Any())
+            {
+                var subjects = _dbContext.Subjects.Where(c => addClassDto.SubjectIds.Contains(c.Id)).ToList();
+                if (subjects.Count == addClassDto.SubjectIds.Count)
+                {
+                    foreach (var subjectItem in subjects)
+                    {
+                        payload.Subjects.Add(subjectItem);
+                        _dbContext.SaveChanges();
+                    }
+                }
+            }
             return ResponseHelper<string>.CreateSuccessRes("Class created", new List<string> { "Success." });
+        }
+
+        public async Task<APIResponse<string>> CreateSubject(AddSubjectDto addSubjectDto)
+        {
+
+            var stClass = await _dbContext.Subjects.FirstOrDefaultAsync(c => c.SubjectName.ToLower() == addSubjectDto.SubjectName.ToLower() );
+            if (stClass != null)
+            {
+                return null;
+            }
+            var payload = new Subject
+            {
+                SubjectName = addSubjectDto.SubjectName,
+                
+            };
+             await _subjectRepository.Create(payload);
+            //_dbContext.Subjects.Add(payload);
+            //_dbContext.SaveChanges();
+            return ResponseHelper<string>.CreateSuccessRes("Subject created", new List<string> { "Success." });
         }
 
     }

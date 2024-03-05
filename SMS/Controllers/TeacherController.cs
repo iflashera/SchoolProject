@@ -14,17 +14,24 @@ namespace API.Controllers
         {
             _teacherService = teacherServices;
         }
-        
+        [AllowAnonymous]
         [HttpPost]   
         public async Task<IActionResult> AddTeacher(AddTeacherDto teacherDto)
         {
             return Response(await _teacherService.CreateTeacher(teacherDto));
         }
-
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateClass(AddClassDto addClassDto)
         {
             return Response(await _teacherService.AddClass(addClassDto));
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> CreateSubject(AddSubjectDto addSubjectDto)
+        {
+            return Response(await _teacherService.AddSubject(addSubjectDto));
         }
     }
 }

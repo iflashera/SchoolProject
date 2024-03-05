@@ -12,5 +12,6 @@ namespace Services.IServices
     {
         Task<APIResponse<string>> CreateTeacher(AddTeacherDto addTeacher);
         Task<APIResponse<string>> AddClass(AddClassDto addClass);
+        Task<APIResponse<string>> AddSubject(AddSubjectDto addSubject);
     }
 }
