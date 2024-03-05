@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Models.Models.Access;
 using Models.Models.Identity;
 using Models.Models.Roles;
 using Models.Models.Users;
@@ -173,7 +175,7 @@ namespace DataContext
                 var userEntry = new UserDetail
                 {
                     ApplicationUserId = Convert.ToString(UManAdmin.Id),
-                    RoleId = dbContext.Roles.FirstOrDefault(r => r.ApplicationRoleId == roleManager.FindByNameAsync("Ifla").Result.Id).Id,
+                    RoleId = dbContext.Roles.FirstOrDefault(r => r.ApplicationRoleId == roleManager.FindByNameAsync("Admin").Result.Id).Id,
                     isActive = true,
                 };
                 dbContext.UserDetails.Add(userEntry);
@@ -196,6 +198,135 @@ namespace DataContext
                 dbContext.SaveChanges();
             }
         }
+        public static void SeedAccessInRoles(SmsDbContext dbContext)
+        {
+            var dbControllers = dbContext.ApplicationControllers.ToList();
+            var dbActions = dbContext.ApplicationActions.ToList();
+            var dbAccesses = dbContext.AccessInRoles.ToList();
+
+            List<ApplicationController> controllersToAdd = new List<ApplicationController>();
+            List<ApplicationController> controllersToRemove = new List<ApplicationController>();
+
+            List<ApplicationAction> actionsToAdd = new List<ApplicationAction>();
+            List<ApplicationAction> actionsToRemove = new List<ApplicationAction>();
+
+            List<AccessInRole> accessesToAdd = new List<AccessInRole>();
+            List<AccessInRole> accessesToRemove = new List<AccessInRole>();
+
+            var controllers = new List<ApplicationController>
+            {
+                new ApplicationController { Name = "Account" },
+                new ApplicationController { Name ="Teacher"}
+            };
+            foreach (var r in controllers)
+            {
+                if (dbControllers.FirstOrDefault(t => t.Name == r.Name) == null)
+                {
+                    controllersToAdd.Add(r);
+                }
+            }
+            foreach (var r in dbControllers)
+            {
+                if (controllers.FirstOrDefault(t => t.Name == r.Name) == null)
+                {
+                    controllersToRemove.Add(r);
+                }
+            }
+
+            if (controllersToAdd.Count > 0)
+            {
+                dbContext.ApplicationControllers.AddRange(controllersToAdd);
+                dbContext.SaveChanges();
+            }
+
+            var dbControllersAfterChange = dbContext.ApplicationControllers.ToList();
+
+            var actions = new[]
+            {
+            // Account actions
+            new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Account").Id,ActionName="Login" ,AccessDescription="Login API" },
+
+            // Admin actions
+            new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Teacher").Id,ActionName="AddTeacher" ,AccessDescription="Add Teacher" },
+            new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Teacher").Id,ActionName="CreateClass" ,AccessDescription="Add Class" },
+
+            };
+
+            foreach (var r in actions)
+            {
+                if (dbActions.FirstOrDefault(t => t.ActionName == r.ActionName && t.ApplicationControllerId == r.ApplicationControllerId) == null)
+                {
+                    actionsToAdd.Add(r);
+                }
+            }
+            foreach (var r in dbActions)
+            {
+                if (actions.FirstOrDefault(t => t.ActionName == r.ActionName && t.ApplicationControllerId == r.ApplicationControllerId) == null)
+                {
+                    actionsToRemove.Add(r);
+                }
+            }
+
+            if (actionsToAdd.Count > 0)
+            {
+                dbContext.ApplicationActions.AddRange(actionsToAdd);
+                dbContext.SaveChanges();
+            }
+
+            var dbActionsAfterChange = dbContext.ApplicationActions.Include(r => r.ApplicationController).ToList();
+            var dbRoles = dbContext.Roles.Include(r => r.ApplicationRole).ToList();
+
+            var accesses = new[]
+            {
+                //account Controller
+              //new AccessInRole{ ApplicationActionId=dbActionsAfterChange.FirstOrDefault(r=>r.ActionName=="Login" && r.ApplicationController.Name=="Account").Id, RoleId=dbRoles.FirstOrDefault(r=>r.ApplicationRole.Name=="Parent").Id},
+              //TeacherController
+              new AccessInRole{ ApplicationActionId=dbActionsAfterChange.FirstOrDefault(r=>r.ActionName=="AddTeacher" && r.ApplicationController.Name=="Teacher").Id, RoleId=dbRoles.FirstOrDefault(r=>r.ApplicationRole.Name=="Admin").Id},
+              new AccessInRole{ ApplicationActionId=dbActionsAfterChange.FirstOrDefault(r=>r.ActionName=="CreateClass" && r.ApplicationController.Name=="Teacher").Id, RoleId=dbRoles.FirstOrDefault(r=>r.ApplicationRole.Name=="Admin").Id},
+
+            };
+            foreach (var r in accesses)
+            {
+                if (dbAccesses.FirstOrDefault(t => t.ApplicationActionId == r.ApplicationActionId && t.RoleId == r.RoleId) == null)
+                {
+                    accessesToAdd.Add(r);
+                }
+            }
+            foreach (var r in dbAccesses)
+            {
+                if (accesses.FirstOrDefault(t => t.ApplicationActionId == r.ApplicationActionId && t.RoleId == r.RoleId) == null)
+                {
+                    accessesToRemove.Add(r);
+                }
+                }
+
+                if (accessesToAdd.Count > 0)
+                {
+                dbContext.AccessInRoles.AddRange(accessesToAdd);
+                dbContext.SaveChanges();
+            }
+
+
+            if (accessesToRemove.Count > 0)
+            {
+                dbContext.AccessInRoles.RemoveRange(accessesToRemove);
+                dbContext.SaveChanges();
+            }
+
+            if (actionsToRemove.Count > 0)
+            {
+                dbContext.ApplicationActions.RemoveRange(actionsToRemove);
+                dbContext.SaveChanges();
+            }
+
+            if (controllersToRemove.Count > 0)
+            {
+                dbContext.ApplicationControllers.RemoveRange(controllersToRemove);
+                dbContext.SaveChanges();
+            }
+        }
+    
+            
 
        public static void SeedData(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager,
           SmsDbContext dbContext)
@@ -203,8 +334,9 @@ namespace DataContext
             SeedApplicationRoles(roleManager);
             SeedRoles(roleManager, dbContext);            
             SeedUsers(userManager, dbContext, roleManager);
+            SeedAccessInRoles(dbContext);
 
-        }
+            }
 
     }
    

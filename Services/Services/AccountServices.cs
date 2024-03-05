@@ -12,6 +12,7 @@ using Repository.IRepositories;
 using Services.IServices;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -26,6 +27,8 @@ namespace Services.Services
         private readonly IRepository<Parent> _parentRepository;
         private readonly IRepository<Teacher> _teacherRepository;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IConfiguration _configuration;
+        JWTToken jwtToken = new JWTToken();
 
         public AccountServices(
             IRepository<UserDetail> userRepository,
@@ -33,7 +36,8 @@ namespace Services.Services
             IRepository<Parent> parentRepository,
             IRepository<Teacher> teacherRepository,
             IRepository<Student> studentRepository,
-            UserManager<ApplicationUser> userManager
+            UserManager<ApplicationUser> userManager,
+            IConfiguration configuration
             )
         {
             _userManager = userManager;
@@ -41,16 +45,17 @@ namespace Services.Services
             _adminRepository = adminRepository;
             _parentRepository = parentRepository;
             _teacherRepository = teacherRepository;
+            _configuration = configuration;
         }
         public async Task<APIResponse<LoginViewModel>> Login(LoginDTO loginDto)
         {
             var user = await _userManager.FindByNameAsync(loginDto.UserName);
-            if(user== null)
+            if (user == null)
             {
                 return ResponseHelper<LoginViewModel>.CreateErrorRes(null, HttpStatusCode.Unauthorized, new List<string> { Constant.FailedLogin });
             }
             var userDetail = await _userRepository.FirstOrDefaultAsync(u => u.ApplicationUserId == user.Id);
-            var userRole = await _userRepository.GetLoggedInUserRoleId(user);
+            var userRoles = await _userRepository.GetLoggedInUserRoleId(user);
             var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
             if (!result)
@@ -67,8 +72,52 @@ namespace Services.Services
                         if (admin == null)
                             return null;
                         var token = jwtToken.GenerateJWTToken(_configuration, user, userRoles.RoleName, userDetail, admin.Id);
-                        return GenerateLoginResponse(token, user, userDetail, Supadmin.Id);
+                        return GenerateLoginResponse(token, user, userDetail, admin.Id);
                     }
+                    if (userDetail.Role.RoleName == "Teacher")
+                    {
+                        var admin = await _adminRepository.FirstOrDefaultAsync(i => i.UserId == userDetail.Id);
+                        if (admin == null)
+                            return null;
+                        var token = jwtToken.GenerateJWTToken(_configuration, user, userRoles.RoleName, userDetail, admin.Id);
+                        return GenerateLoginResponse(token, user, userDetail, admin.Id);
+                    }
+                    if (userDetail.Role.RoleName == "Student")
+                    {
+                        var admin = await _adminRepository.FirstOrDefaultAsync(i => i.UserId == userDetail.Id);
+                        if (admin == null)
+                            return null;
+                        var token = jwtToken.GenerateJWTToken(_configuration, user, userRoles.RoleName, userDetail, admin.Id);
+                        return GenerateLoginResponse(token, user, userDetail, admin.Id);
+                    }
+                    if (userDetail.Role.RoleName == "Parent")
+                    {
+                        var admin = await _adminRepository.FirstOrDefaultAsync(i => i.UserId == userDetail.Id);
+                        if (admin == null)
+                            return null;
+                        var token = jwtToken.GenerateJWTToken(_configuration, user, userRoles.RoleName, userDetail, admin.Id);
+                        return GenerateLoginResponse(token, user, userDetail, admin.Id);
+                    }
+
                 }
+                return ResponseHelper<LoginViewModel>.CreateErrorRes(null, HttpStatusCode.Unauthorized, new List<string> { Constant.FailedLogin });
+
+            }
+        }
+        private APIResponse<LoginViewModel> GenerateLoginResponse(JwtSecurityToken token, ApplicationUser user, UserDetail userDetail, int Id)
+        {
+            return ResponseHelper<LoginViewModel>.CreateSuccessResponses(new LoginViewModel
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                Expiration = token.ValidTo,
+                RoleName = userDetail.Role.RoleName,
+                RoleId = userDetail.RoleId,
+                FirstName = user.FirsName,
+                LastName = user.LastName,
+                Email = user.UserName,
+                UserId = userDetail.Id,
+                Id = Id,                
+            }, new List<string> { Constant.SuccessfulLogin });
+        }
     }
 }

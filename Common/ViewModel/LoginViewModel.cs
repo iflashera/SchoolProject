@@ -10,8 +10,7 @@
         public int RoleId { get; set; }
         public string RoleName { get; set; }
         public string Token { get; set; }
-        public int SchoolId { get; set; }
-
+      
         public DateTime Expiration { get; set; }
     }
 }

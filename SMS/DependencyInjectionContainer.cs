@@ -2,6 +2,7 @@
 using Services.IServices;
 using Repository.IRepositories;
 using Repository.Repositories;
+using Common.CurrentUser;
 
 namespace API
 {
@@ -11,6 +12,12 @@ namespace API
         {
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IAccountServices, AccountServices>();
+            services.AddScoped<ICurrentUser, CurrentUser>();
+            services.AddScoped<IFilterRepository, FilterRepository>();
+            services.AddScoped<IFilterService, FilterService>();
+            services.AddScoped<ITeacherService, TeacherService>();
+            services.AddScoped<ITeacherRepository, TeacherRepository>();
+
             return services;
         }
        

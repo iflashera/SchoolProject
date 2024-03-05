@@ -1,4 +1,5 @@
-﻿using DataContext;
+﻿using Common.CurrentUser;
+using DataContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Models.Models;

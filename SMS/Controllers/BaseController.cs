@@ -1,13 +1,17 @@
-﻿using Common.Helper;
+﻿using API.Filters;
+using Common.Helper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace API.Controllers
 {
+    [SmsAuthorize]
     [ApiController]
-    [ApiExplorerSettings(IgnoreApi = true)]
+   
     public class BaseController : ControllerBase
     {
+        [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult Response<T>(APIResponse<T> response)
         {
             return response.IsValidationError switch
