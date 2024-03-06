@@ -1,5 +1,6 @@
 ﻿using Common.DTOs.Teacher;
 using Common.Helper;
+using Common.ViewModel;
 using Repository.IRepositories;
 using Repository.Repositories;
 using Services.IServices;
@@ -40,6 +41,14 @@ namespace Services.Services
                 return ResponseHelper<string>.CreateErrorRes(HttpStatusCode.Conflict, new List<string> { "Subject with the same name already exists" });
             }
             return subjectRes;
+        }
+        public async Task<APIResponse<List<TeacherViewModel>>> GetTeachers()
+        {
+            return await _teacherRepository.GetTeachers();
+        }
+        public async Task<APIResponse<List<ClassViewModel>>> GetAllClasses()
+        {
+            return await _teacherRepository.GetAllClasses();
         }
     }
 }

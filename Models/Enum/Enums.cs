@@ -20,6 +20,14 @@ namespace Models.Enum
                 Inactive = 0,
                 Active = 1,
             }
+            public enum AddUpdateResults
+            {
+                Success = 1,
+                Duplicate,
+                Exception,
+                NotFound,
+                UnAuthorized
+            }
 
-        }    
+    }    
 }
