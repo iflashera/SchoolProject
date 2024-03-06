@@ -50,5 +50,15 @@ namespace Services.Services
         {
             return await _teacherRepository.GetAllClasses();
         }
+
+        public async Task<APIResponse<string>> UpdateClass(UpdateClassDto updateClass)
+        {
+            var stClass = await _teacherRepository.UpdateClass(updateClass);
+            if (stClass == null)
+            {
+                return ResponseHelper<string>.CreateErrorRes("Class with this id doesn't exist", new List<string> { "class with this id doesn't exist" });
+            }
+            return stClass;
+        }
     }
 }

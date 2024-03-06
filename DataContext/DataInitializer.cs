@@ -217,7 +217,8 @@ namespace DataContext
             {
                 new ApplicationController { Name = "Account" },
                 new ApplicationController { Name ="Teacher"},
-                new ApplicationController { Name ="Parent"}
+                new ApplicationController { Name ="Parent"},
+                new ApplicationController { Name ="Student"}
             };
             foreach (var r in controllers)
             {
@@ -254,6 +255,8 @@ namespace DataContext
             new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Teacher").Id,ActionName="GetTeacher" ,AccessDescription="Get Teacher" },
             new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Teacher").Id,ActionName="GetAllClasses" ,AccessDescription="Get All Classes" },
             new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Parent").Id,ActionName="GetAllParents" ,AccessDescription="Get All Parents" },
+            new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Student").Id,ActionName="GetStudentsByClassId" ,AccessDescription="Get All Students" },
+            new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Teacher").Id,ActionName="UpdateClass" ,AccessDescription="Update Class" },
 
             };
 

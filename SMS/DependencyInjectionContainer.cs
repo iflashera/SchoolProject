@@ -19,6 +19,8 @@ namespace API
             services.AddScoped<ITeacherRepository, TeacherRepository>();
             services.AddScoped<IParentService, ParentService>();
             services.AddScoped<IParentRepository, ParentRepository>();
+            services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<IStudentRepository, StudentRepository>();
 
             return services;
         }
