@@ -202,6 +202,28 @@ namespace Repository.Repositories
             return ResponseHelper<List<ClassViewModel>>.CreateGetSuccessResponse(classVM, classVM.Count);
 
         }
+
+        public async Task<APIResponse<string>> UpdateClass(UpdateClassDto updateClass)
+        {
+
+            var Sclaxx = await _dbContext.Classes.Where(c => c.ClassName == updateClass.OldClassName).ToListAsync();
+            if(Sclaxx == null)
+            {
+                return null;
+            }
+
+            foreach( var claxx in Sclaxx)
+            {
+                if(claxx.ClassName == updateClass.ClassName)
+                {
+                    return null;
+                }
+                claxx.ClassName= updateClass.ClassName;
+                await _classRepository.Update(claxx);
+            }
+            return ResponseHelper<string>.CreateSuccessRes(null, new List<string> { "Class updated successfully." });
+
+        }
     }
 
 }

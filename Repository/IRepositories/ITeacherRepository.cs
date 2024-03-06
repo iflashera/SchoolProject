@@ -17,6 +17,8 @@ namespace Repository.IRepositories
         Task<APIResponse<string>> CreateSubject(AddSubjectDto classSubject);
         Task<APIResponse<List<TeacherViewModel>>> GetTeachers( );
         Task<APIResponse<List<ClassViewModel>>> GetAllClasses();
+        Task<APIResponse<string>> UpdateClass(UpdateClassDto updateClass);
+
 
     }
 }

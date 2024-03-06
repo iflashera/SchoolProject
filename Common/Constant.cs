@@ -21,6 +21,8 @@ namespace Common
         public static readonly string NotFound = "Not found.";
         public static readonly string NotFound1 = "{0} Not found.";
         public static readonly string NoStudentFound = "No Student found with this id.";
+        public static readonly string NoClassFound = "No Class found with this id.";
+
         public static readonly string NoParentFound = "No Parent found with this id.";
         public static readonly string NoTeacherFound = "No Teacher found with this id.";
 
