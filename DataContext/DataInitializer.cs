@@ -216,7 +216,8 @@ namespace DataContext
             var controllers = new List<ApplicationController>
             {
                 new ApplicationController { Name = "Account" },
-                new ApplicationController { Name ="Teacher"}
+                new ApplicationController { Name ="Teacher"},
+                new ApplicationController { Name ="Parent"}
             };
             foreach (var r in controllers)
             {
@@ -248,7 +249,11 @@ namespace DataContext
 
             // Admin actions
             new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Teacher").Id,ActionName="AddTeacher" ,AccessDescription="Add Teacher" },
-            //new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Teacher").Id,ActionName="CreateClass" ,AccessDescription="Add Class" },
+            new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Teacher").Id,ActionName="CreateClass" ,AccessDescription="Add Class" },
+            new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Parent").Id,ActionName="CreateParent" ,AccessDescription="Add Parent" },
+            new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Teacher").Id,ActionName="GetTeacher" ,AccessDescription="Get Teacher" },
+            new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Teacher").Id,ActionName="GetAllClasses" ,AccessDescription="Get All Classes" },
+            new ApplicationAction{ ApplicationControllerId=dbControllersAfterChange.FirstOrDefault(r=>r.Name=="Parent").Id,ActionName="GetAllParents" ,AccessDescription="Get All Parents" },
 
             };
 
@@ -283,6 +288,7 @@ namespace DataContext
             //  //TeacherController
             //  new AccessInRole{ ApplicationActionId=dbActionsAfterChange.FirstOrDefault(r=>r.ActionName=="AddTeacher" && r.ApplicationController.Name=="Teacher").Id, RoleId=dbRoles.FirstOrDefault(r=>r.ApplicationRole.Name=="Admin").Id},
             //  new AccessInRole{ ApplicationActionId=dbActionsAfterChange.FirstOrDefault(r=>r.ActionName=="CreateClass" && r.ApplicationController.Name=="Teacher").Id, RoleId=dbRoles.FirstOrDefault(r=>r.ApplicationRole.Name=="Admin").Id},
+            //  new AccessInRole{ ApplicationActionId=dbActionsAfterChange.FirstOrDefault(r=>r.ActionName=="CreateParent" && r.ApplicationController.Name=="Parent").Id, RoleId=dbRoles.FirstOrDefault(r=>r.ApplicationRole.Name=="Admin").Id},
 
             //};
             //foreach (var r in accesses)
@@ -298,20 +304,20 @@ namespace DataContext
             //    {
             //        accessesToRemove.Add(r);
             //    }
-            //    }
+            //}
 
-            //    if (accessesToAdd.Count > 0)
-            //    {
+            //if (accessesToAdd.Count > 0)
+            //{
             //    dbContext.AccessInRoles.AddRange(accessesToAdd);
             //    dbContext.SaveChanges();
             //}
 
 
-            if (accessesToRemove.Count > 0)
-            {
-                dbContext.AccessInRoles.RemoveRange(accessesToRemove);
-                dbContext.SaveChanges();
-            }
+            //if (accessesToRemove.Count > 0)
+            //{
+            //    dbContext.AccessInRoles.RemoveRange(accessesToRemove);
+            //    dbContext.SaveChanges();
+            //}
 
             if (actionsToRemove.Count > 0)
             {

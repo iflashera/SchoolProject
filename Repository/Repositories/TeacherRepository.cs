@@ -2,8 +2,10 @@
 using Common.CustomException;
 using Common.DTOs.Teacher;
 using Common.Helper;
+using Common.ViewModel;
 using DataContext;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Models.Models.Classes;
 using Models.Models.Identity;
@@ -12,6 +14,7 @@ using Repository.IRepositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,6 +29,7 @@ namespace Repository.Repositories
         private readonly IRepository<Subject> _subjectRepository;
         private readonly ICurrentUser _currentUser;
 
+
         public TeacherRepository(SmsDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager,
         ICurrentUser currentUser, IRepository<Class> classRepository, IRepository<Subject> subjectRepository)
         {
@@ -33,8 +37,8 @@ namespace Repository.Repositories
             _userManager = userManager;
             _roleManager = roleManager;
             _currentUser = currentUser;
-            _classRepository = classRepository; 
-            _subjectRepository = subjectRepository; 
+            _classRepository = classRepository;
+            _subjectRepository = subjectRepository;
         }
         public async Task<APIResponse<string>> AddTeacher(AddTeacherDto teacherDto)
         {
@@ -46,7 +50,7 @@ namespace Repository.Repositories
                 user.FirsName = teacherDto.FirstName;
                 user.LastName = teacherDto.LastName;
 
-                IdentityResult result = _userManager.CreateAsync(user).Result;
+                IdentityResult result = _userManager.CreateAsync(user, "Password@1").Result;
                 if (result.Succeeded)
                 {
                     _userManager.AddToRoleAsync(user, "Teacher").Wait();
@@ -112,7 +116,7 @@ namespace Repository.Repositories
         }
         public async Task<APIResponse<string>> CreateClass(AddClassDto addClassDto)
         {
-           
+
             var stClass = await _dbContext.Classes.FirstOrDefaultAsync(c => c.ClassSection.ToLower() == addClassDto.ClassSection.ToLower() && c.ClassName == addClassDto.ClassName && c.Id == _currentUser.Id);
             if (stClass != null)
             {
@@ -120,7 +124,7 @@ namespace Repository.Repositories
             }
             var payload = new Class
             {
-                ClassName = addClassDto.ClassName,                
+                ClassName = addClassDto.ClassName,
                 ClassSection = addClassDto.ClassSection,
             };
             // await _classRepository.Create(payload);
@@ -144,7 +148,7 @@ namespace Repository.Repositories
         public async Task<APIResponse<string>> CreateSubject(AddSubjectDto addSubjectDto)
         {
 
-            var stClass = await _dbContext.Subjects.FirstOrDefaultAsync(c => c.SubjectName.ToLower() == addSubjectDto.SubjectName.ToLower() );
+            var stClass = await _dbContext.Subjects.FirstOrDefaultAsync(c => c.SubjectName.ToLower() == addSubjectDto.SubjectName.ToLower());
             if (stClass != null)
             {
                 return null;
@@ -152,14 +156,52 @@ namespace Repository.Repositories
             var payload = new Subject
             {
                 SubjectName = addSubjectDto.SubjectName,
-                
+
             };
-             await _subjectRepository.Create(payload);
+            await _subjectRepository.Create(payload);
             //_dbContext.Subjects.Add(payload);
             //_dbContext.SaveChanges();
             return ResponseHelper<string>.CreateSuccessRes("Subject created", new List<string> { "Success." });
         }
 
+        public async Task<APIResponse<List<TeacherViewModel>>> GetTeachers()
+        {
+            var teac = await _dbContext.Teachers.Where(l => l.IsActive).Include(c => c.Classes).ToListAsync();
+
+            if (teac == null)
+            {
+                return ResponseHelper<List<TeacherViewModel>>.CreateSuccessRes(null, HttpStatusCode.OK, new List<string> { "No Teachers found" });
+            }
+            var teacherVM = teac.Select(teacher => new TeacherViewModel
+            {
+                TeacherName = $"{teacher.FirstName}  {teacher.LastName}",
+                Classes = teacher.Classes.Select(claxx => new ClassViewModel
+                {
+                    ClassName = claxx.ClassName,
+                    ClassSection = claxx.ClassSection,
+
+                }).ToList()
+            }).ToList();
+            return ResponseHelper<List<TeacherViewModel>>.CreateGetSuccessResponse(teacherVM, teacherVM.Count);
+        }
+        public async Task<APIResponse<List<ClassViewModel>>> GetAllClasses()
+        {
+            var claxx = await _dbContext.Classes.ToListAsync();
+
+            if(claxx == null)
+            {
+                return ResponseHelper<List<ClassViewModel>>.CreateSuccessRes(null, HttpStatusCode.OK, new List<string> { "No classes found" });
+
+            }
+
+            var classVM = claxx.Select(claxx => new ClassViewModel
+            {
+                ClassName = claxx.ClassName,    
+                ClassSection = claxx.ClassSection, 
+            }).ToList();
+            return ResponseHelper<List<ClassViewModel>>.CreateGetSuccessResponse(classVM, classVM.Count);
+
+        }
     }
+
 }
-   

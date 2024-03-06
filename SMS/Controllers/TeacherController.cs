@@ -33,5 +33,17 @@ namespace API.Controllers
         {
             return Response(await _teacherService.AddSubject(addSubjectDto));
         }
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetTeachers( )
+        {
+            return Response(await _teacherService.GetTeachers());
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetAllClasses()
+        {
+            return Response(await _teacherService.GetAllClasses());
+        }
     }
 }
