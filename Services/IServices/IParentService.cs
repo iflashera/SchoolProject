@@ -16,6 +16,7 @@ namespace Services.IServices
         Task<APIResponse<List<ParentViewModel>>> GetAllParents();
 
         Task<APIResponse<string>> AddChildToParent(int parentId, List<AddChildDto> children);
+        Task<APIResponse<string>> UpdateParent(UpdateParentDto updateParent);
 
     }
 }

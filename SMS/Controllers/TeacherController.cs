@@ -51,5 +51,11 @@ namespace API.Controllers
         {
             return Response(await _teacherService.UpdateClass(updateClass));
         }
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> UpdateTeacher(UpdateTeacherDto updateTeacher)
+        {
+            return Response(await _teacherService.UpdateTeacher(updateTeacher));
+        }
     }
 }

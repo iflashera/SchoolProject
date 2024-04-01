@@ -224,6 +224,64 @@ namespace Repository.Repositories
             return ResponseHelper<string>.CreateSuccessRes(null, new List<string> { "Class updated successfully." });
 
         }
+
+        public async Task<APIResponse<string>> UpdateTeacher(UpdateTeacherDto updateteacher)
+        {
+            var teacher = await _dbContext.Teachers.Include(c => c.Classes).Include(c => c.Subjects).FirstOrDefaultAsync(i => i.Id == updateteacher.Id && i.IsActive == true);
+            if (teacher == null)
+            {
+                return ResponseHelper<string>.CreateNotFoundErrorResponse(HttpStatusCode.NotFound, new List<string> { "No Teacher Found with this ID." });
+            }
+            // Classes
+            var classIdsToUpdate = updateteacher.ClassIds.ToList();
+
+            var classesToRemove = teacher.Classes.Where(c => !classIdsToUpdate.Contains(c.Id)).ToList();
+            foreach (var classToRemove in classesToRemove)
+            {
+                teacher.Classes.Remove(classToRemove);
+            }
+      
+            var classesToAdd = classIdsToUpdate.Where(id => !teacher.Classes.Any(c => c.Id == id)).ToList();
+            foreach (var classIdToAdd in classesToAdd)
+            {
+                var classToAdd = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == classIdToAdd);
+                if (classToAdd != null)
+                {
+                    teacher.Classes.Add(classToAdd);
+                }
+            }
+            //Subjects
+            var subjectIdsToUpdate = updateteacher.SubjectIds.ToList();
+            var subjectsToRemove = teacher.Subjects.Where(c => !subjectIdsToUpdate.Contains(c.Id)).ToList();
+            foreach (var subjectToRemove in subjectsToRemove)
+            {
+                teacher.Subjects.Remove(subjectToRemove);
+            }
+            var SubjectsToAdd= subjectIdsToUpdate.Where(id => !teacher.Subjects.Any(c=> c.Id== id)).ToList();
+            foreach( var SubjectIdToAdd in SubjectsToAdd)
+            {
+                var subjectToAdd = await _dbContext.Subjects.FirstOrDefaultAsync(c => c.Id == SubjectIdToAdd);
+                if(subjectToAdd != null)
+                {
+                    teacher.Subjects.Add(subjectToAdd);
+                }
+            }
+            var appUser = await _userManager.FindByEmailAsync(teacher.UserName);
+            if (appUser == null)
+            {
+                return ResponseHelper<string>.CreateNotFoundErrorResponse(HttpStatusCode.NotFound, new List<string> { "No Teacher Found with this ID." });
+            }
+
+            teacher.FirstName = updateteacher.FirstName;
+            teacher.LastName = updateteacher.LastName;
+
+            _dbContext.Teachers.Update(teacher);
+            appUser.FirsName = updateteacher.FirstName;
+            appUser.LastName = updateteacher.LastName;
+            await _dbContext.SaveChangesAsync();
+
+            return ResponseHelper<string>.CreateSuccessRes(null, new List<string> { "Teacher Updated Successfully" });
+        }
     }
 
 }

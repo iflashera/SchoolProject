@@ -2,6 +2,7 @@
 using Common.DTOs.Teacher;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Models.Models.Users;
 using Services.IServices;
 
 namespace API.Controllers
@@ -32,7 +33,13 @@ namespace API.Controllers
         public async Task<IActionResult> AddChildToParent(int parentId, List<AddChildDto> childDto)
         {
             return Response(await _parentService.AddChildToParent(parentId, childDto));
-        
+        }
+        [AllowAnonymous]
+        [HttpPost]
+         
+        public async Task<IActionResult> UpdateParent(UpdateParentDto updateParentDto)
+        {
+            return Response(await _parentService.UpdateParent( updateParentDto));
         }
     }
 }

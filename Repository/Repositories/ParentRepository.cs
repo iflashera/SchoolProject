@@ -210,7 +210,10 @@ namespace Repository.Repositories
             return ResponseHelper<List<ParentViewModel>>.CreateGetSuccessResponse(parentVM, parentVM.Count);
 
         }
-
-
+         
+        public async Task<APIResponse<string>> UpdateParent(UpdateParentDto ParentDto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
