@@ -1,6 +1,7 @@
 ﻿using Common;
 using Common.CustomException;
 using Common.DTOs.Parent;
+using Common.DTOs.Teacher;
 using Common.Helper;
 using Common.ViewModel;
 using Repository.IRepositories;
@@ -48,6 +49,10 @@ namespace Services.Services
         public async Task<APIResponse<List<ParentViewModel>>> GetAllParents()
         {
             return await _parentRepository.GetAllParents();
+        }
+        public async Task<APIResponse<string>> UpdateParent(UpdateParentDto updateParent)
+        {
+            return await _parentRepository.UpdateParent(updateParent);
         }
     }
 }

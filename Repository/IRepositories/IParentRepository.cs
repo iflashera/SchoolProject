@@ -19,6 +19,7 @@ namespace Repository.IRepositories
         Task<APIResponse<List<ParentViewModel>>> GetAllParents();
 
         Task<APIResponse<string>> AddChildToParent(int parentId, List<AddChildDto> children);
+        Task<APIResponse<string>> UpdateParent( UpdateParentDto ParentDto);
 
     }
 }

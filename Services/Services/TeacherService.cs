@@ -60,5 +60,10 @@ namespace Services.Services
             }
             return stClass;
         }
+
+        public async Task<APIResponse<string>> UpdateTeacher(UpdateTeacherDto updateteacher)
+        {
+            return await _teacherRepository.UpdateTeacher(updateteacher);
+        }
     }
 }
